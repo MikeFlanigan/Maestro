@@ -114,6 +114,19 @@ class Controller:
         msb = (accel >> 7) & 0x7f #shift 7 and take next 7 bits for msb
         cmd = chr(0x09) + chr(chan) + chr(lsb) + chr(msb)
         self.sendCmd(cmd)
+
+    # Set PWM channel value
+    # Valid input PWM signals are 0-127
+    # This functionality only works for some models of the micro maestro controller
+    # the 12 channel unit has 1 PWM enabled channel. The 6 channel controller has none. 
+    def setPWM(self, chan, pwm):
+        OnTimelsb = pwm & 0x7f #7 bits for least significant byte
+        OnTimemsb = (pwm >> 7) & 0x7f #shift 7 and take next 7 bits for msb
+        period = 1020 # this is just one option from the list of recommended possibilities in the documentation
+        Periodlsb = period & 0x7f #7 bits for least significant byte
+        Periodmsb = (period >> 7) & 0x7f #shift 7 and take next 7 bits for msb       
+        cmd = chr(0x0A) + chr(chan) + chr(OnTimelsb) + chr(OnTimemsb) + chr(Periodlsb) + chr(Periodmsb)
+        self.sendCmd(cmd)
     
     # Get the current position of the device on the specified channel
     # The result is returned in a measure of quarter-microseconds, which mirrors
